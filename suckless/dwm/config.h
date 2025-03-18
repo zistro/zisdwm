@@ -3,6 +3,7 @@
 /* appearance */
 static const unsigned int borderpx  = 1;        /* border pixel of windows */
 static const unsigned int snap      = 32;       /* snap pixel */
+static const int swallowfloating    = 0;        /* 1 means swallow floating windows by default */
 static const unsigned int gappih    = 10;       /* horiz inner gap between windows */
 static const unsigned int gappiv    = 10;       /* vert inner gap between windows */
 static const unsigned int gappoh    = 10;       /* horiz outer gap between windows and screen edge */
@@ -49,12 +50,14 @@ static const Rule rules[] = {
 	 *	WM_CLASS(STRING) = instance, class
 	 *	WM_NAME(STRING) = title
 	 */
-	/* class      instance                  title       tags mask          isfloating                      monitor */
-	{ "Gimp",	  NULL,			NULL,		0,			1,			 -1 },
-	{ "Firefox",      NULL,			NULL,		1 << 8,			0,			 -1 },
-	{ NULL,		  "spterm",		NULL,		SPTAG(0),		1,			 -1 },
-	{ NULL,		  "spfm",		NULL,		SPTAG(1),		1,			 -1 },
-	{ NULL,		  "keepassxc",	        NULL,		SPTAG(2),		0,			 -1 },
+	/* class     instance    title           tags mask  isfloating  isterminal  noswallow  monitor */
+	{ "Gimp",    NULL,       NULL,           0,         1,          0,           0,        -1 },
+	{ "Firefox", NULL,       NULL,           1 << 8,    0,          0,          -1,        -1 },
+	{ "kitty",   NULL,       NULL,           0,         0,          1,           0,        -1 },
+	{ NULL,      NULL,       "Event Tester", 0,         0,          0,           1,        -1 }, /* xev */
+	{ NULL,      "spterm",	 NULL,		 SPTAG(0),  1,		1,	     0,        -1 },
+	{ NULL,	     "spfm",	 NULL,		 SPTAG(1),  1,		1,	     0,        -1 },
+	{ NULL,	     "keepassxc",NULL,		 SPTAG(2),  0,		0,	     1,        -1 },
 };
 
 /* layout(s) */
@@ -117,20 +120,20 @@ static const Key keys[] = {
 	{ MODKEY|ShiftMask,             XK_j,      movestack,      {.i = +1 } },
 	{ MODKEY|ShiftMask,             XK_k,      movestack,      {.i = -1 } },
 	{ MODKEY,                       XK_Return, zoom,           {0} },
-	{ MODKEY|Mod4Mask,              XK_u,      incrgaps,       {.i = +1 } },
-	{ MODKEY|Mod4Mask|ShiftMask,    XK_u,      incrgaps,       {.i = -1 } },
-	{ MODKEY|Mod4Mask,              XK_i,      incrigaps,      {.i = +1 } },
-	{ MODKEY|Mod4Mask|ShiftMask,    XK_i,      incrigaps,      {.i = -1 } },
-	{ MODKEY|Mod4Mask,              XK_o,      incrogaps,      {.i = +1 } },
-	{ MODKEY|Mod4Mask|ShiftMask,    XK_o,      incrogaps,      {.i = -1 } },
-	{ MODKEY|Mod4Mask,              XK_6,      incrihgaps,     {.i = +1 } },
-	{ MODKEY|Mod4Mask|ShiftMask,    XK_6,      incrihgaps,     {.i = -1 } },
-	{ MODKEY|Mod4Mask,              XK_7,      incrivgaps,     {.i = +1 } },
-	{ MODKEY|Mod4Mask|ShiftMask,    XK_7,      incrivgaps,     {.i = -1 } },
-	{ MODKEY|Mod4Mask,              XK_8,      incrohgaps,     {.i = +1 } },
-	{ MODKEY|Mod4Mask|ShiftMask,    XK_8,      incrohgaps,     {.i = -1 } },
-	{ MODKEY|Mod4Mask,              XK_9,      incrovgaps,     {.i = +1 } },
-	{ MODKEY|Mod4Mask|ShiftMask,    XK_9,      incrovgaps,     {.i = -1 } },
+/*	{ MODKEY|Mod4Mask,              XK_,       incrgaps,       {.i = +1 } },
+	{ MODKEY|Mod4Mask|ShiftMask,    XK_,       incrgaps,       {.i = -1 } }, 
+	{ MODKEY|Mod4Mask,              XK_,       incrigaps,      {.i = +1 } },
+	{ MODKEY|Mod4Mask|ShiftMask,    XK_,       incrigaps,      {.i = -1 } },
+	{ MODKEY|Mod4Mask,              XK_,       incrogaps,      {.i = +1 } },
+	{ MODKEY|Mod4Mask|ShiftMask,    XK_,       incrogaps,      {.i = -1 } },
+	{ MODKEY|Mod4Mask,              XK_,       incrihgaps,     {.i = +1 } },
+	{ MODKEY|Mod4Mask|ShiftMask,    XK_,       incrihgaps,     {.i = -1 } },
+	{ MODKEY|Mod4Mask,              XK_,       incrivgaps,     {.i = +1 } },
+	{ MODKEY|Mod4Mask|ShiftMask,    XK_,       incrivgaps,     {.i = -1 } },
+	{ MODKEY|Mod4Mask,              XK_,       incrohgaps,     {.i = +1 } },
+	{ MODKEY|Mod4Mask|ShiftMask,    XK_,       incrohgaps,     {.i = -1 } },
+	{ MODKEY|Mod4Mask,              XK_,       incrovgaps,     {.i = +1 } }, 
+	{ MODKEY|Mod4Mask|ShiftMask,    XK_,       incrovgaps,     {.i = -1 } }, */
 	{ MODKEY|Mod4Mask,              XK_0,      togglegaps,     {0} },
 	{ MODKEY|Mod4Mask|ShiftMask,    XK_0,      defaultgaps,    {0} },
 	{ MODKEY,                       XK_Tab,    view,           {0} },
@@ -151,9 +154,9 @@ static const Key keys[] = {
 	{ MODKEY,            		XK_y,  	   togglescratch,  {.ui = 0 } },
 	{ MODKEY,            		XK_u,	   togglescratch,  {.ui = 1 } },
 	{ MODKEY,            		XK_x,	   togglescratch,  {.ui = 2 } },
-	{ 0, 				XK_F10,    spawn, 	   SHCMD("pamixer -t") },
-	{ 0, 				XK_F11,    spawn, 	   SHCMD("pamixer -d 5") },
-	{ 0, 				XK_F12,    spawn, 	   SHCMD("pamixer -i 5") },
+	{ 0, 				XK_F10,    spawn, 	   SHCMD("pamixer -t && kill -SIGRTMIN+5 $(pidof dwmblocks)") },
+	{ 0, 				XK_F11,    spawn, 	   SHCMD("pamixer -d 5 && kill -SIGRTMIN+5 $(pidof dwmblocks)") },
+	{ 0, 				XK_F12,    spawn, 	   SHCMD("pamixer -i 5 && kill -SIGRTMIN+5 $(pidof dwmblocks)") },
 	{ 0,				XK_Print,  spawn,	   SHCMD("ss.sh") },
 	{ MODKEY,			XK_p,	   spawn,	   SHCMD("dwmpower.sh") },
 	TAGKEYS(                        XK_1,                      0)

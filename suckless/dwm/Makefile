@@ -9,7 +9,7 @@ OBJ = ${SRC:.c=.o}
 all: dwm
 
 .c.o:
-	${CC} -c ${CFLAGS} $<
+	${CC} -c ${CFLAGS} -Wno-unused-function -Wno-unused-variable $<
 
 ${OBJ}: config.h config.mk
 
